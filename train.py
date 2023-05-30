@@ -5,7 +5,8 @@ from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from filetoimage import file2images, height, width
 import numpy as np
-
+import os
+import tensorflow as tf
 
 benignfileloc = "benign"
 maliciousfileloc = "malicious"
@@ -50,4 +51,10 @@ batch_size = 512
 epochs = 100
 labels = [0 for _ in benign_img_list] + [1 for _ in malicious_img_list]
 labels = np.array(labels)
-model.fit(benign_img_list+malicious_img_list, labels, batch_size = batch_size, epochs = epochs, validation_split = 0.25, shuffle = True)
+
+checkpoint_path = "training/cp.ckpt"
+checkpoint_dir = os.path.dirname(checkpoint_path)
+cp_callback = keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                 save_weights_only=True,
+                                                 verbose=1)
+model.fit(benign_img_list+malicious_img_list, labels, batch_size = batch_size, epochs = epochs, validation_split = 0.25, shuffle = True, callbacks=[cp_callback])
